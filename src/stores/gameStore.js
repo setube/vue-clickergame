@@ -495,6 +495,7 @@ export const useGameStore = defineStore('game', {
         // 只保存收藏品ID和拥有状态
         collectibles: this.collectibles.map((collectible) => ({
           id: collectible.id,
+          cost: collectible.cost,
           level: collectible.level,
         })),
         // 只保存成就ID和解锁状态
@@ -579,6 +580,7 @@ export const useGameStore = defineStore('game', {
                   // 合并模板和保存的状态
                   return {
                     ...template,
+                    cost: savedCollectible.cost,
                     level: savedCollectible.level || 0,
                   }
                 })

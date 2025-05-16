@@ -113,8 +113,9 @@ export const collectibles = [
     id: 1,
     name: '幸运四叶草',
     level: 0,
+    maxLevel: 500,
     description: '暴击几率增加',
-    cost: 5000,
+    cost: 500,
     rarity: 'common', // 稀有度：普通
     effect: {
       type: 'critChance',
@@ -126,7 +127,7 @@ export const collectibles = [
     name: '金色硬币',
     level: 0,
     description: '点击金币永久',
-    cost: 10000,
+    cost: 1000,
     rarity: 'common',
     effect: {
       type: 'clickPower',
@@ -138,7 +139,7 @@ export const collectibles = [
     name: '小型矿车',
     level: 0,
     description: '自动收入永久',
-    cost: 15000,
+    cost: 1500,
     rarity: 'common',
     effect: {
       type: 'passiveIncome',
@@ -149,8 +150,9 @@ export const collectibles = [
     id: 4,
     name: '魔法放大镜',
     level: 0,
+    maxLevel: 100,
     description: '所有收入增加',
-    cost: 25000,
+    cost: 2500,
     rarity: 'uncommon', // 稀有度：稀有
     effect: {
       type: 'incomeMultiplier',
@@ -161,8 +163,9 @@ export const collectibles = [
     id: 5,
     name: '彩虹宝石',
     level: 0,
+    maxLevel: 500,
     description: '暴击倍率增加',
-    cost: 50000,
+    cost: 5000,
     rarity: 'uncommon',
     effect: {
       type: 'critPower',
@@ -173,8 +176,9 @@ export const collectibles = [
     id: 6,
     name: '黄金小猪',
     level: 0,
+    maxLevel: 1000,
     description: '自动收入速度提高',
-    cost: 75000,
+    cost: 7500,
     rarity: 'uncommon',
     effect: {
       type: 'passiveSpeed',
@@ -185,8 +189,9 @@ export const collectibles = [
     id: 7,
     name: '幸运猫咪',
     level: 0,
+    maxLevel: 1000,
     description: '幸运加成增加',
-    cost: 100000,
+    cost: 10000,
     rarity: 'rare', // 稀有度：珍稀
     effect: {
       type: 'luckBoost',
@@ -197,8 +202,9 @@ export const collectibles = [
     id: 8,
     name: '点金手套',
     level: 0,
+    maxLevel: 1000,
     description: '黄金点击几率增加',
-    cost: 250000,
+    cost: 25000,
     rarity: 'rare',
     effect: {
       type: 'goldenChance',
@@ -209,8 +215,9 @@ export const collectibles = [
     id: 9,
     name: '财神像',
     level: 0,
+    maxLevel: 1000,
     description: '所有收入增加',
-    cost: 500000,
+    cost: 50000,
     rarity: 'epic', // 稀有度：史诗
     effect: {
       type: 'incomeMultiplier',

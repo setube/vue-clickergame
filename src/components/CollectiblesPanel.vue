@@ -25,7 +25,7 @@
           <div class="collectible-status">
             <div class="collectible-cost">
               <i class="pi pi-dollar"></i>
-              <span>{{ gameStore.formatNumber(item.cost * (item.level || 1)) }}</span>
+              <span>{{ gameStore.formatNumber(calculateUpgradeCost(item)) }}</span>
             </div>
             <Button :label="canBuyCollectible(item) ? '升级' : '金币不足'" :disabled="!canBuyCollectible(item)"
               @click="buyCollectible(item.id)" :severity="canBuyCollectible(item) ? 'success' : 'secondary'"
@@ -67,7 +67,12 @@ const filteredCollectibles = computed(() => {
 
 // 检查是否可以购买收藏品
 const canBuyCollectible = (item) => {
-  return gameStore.coins >= item.cost * (item.level || 1)
+  return gameStore.coins >= calculateUpgradeCost(item)
+}
+
+// 计算升级所需的金币数量
+const calculateUpgradeCost = (item) => {
+  return item.cost * (item.level || 1)
 }
 
 // 定义向父组件传递的事件
