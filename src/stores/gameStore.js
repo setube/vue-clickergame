@@ -102,7 +102,7 @@ export const useGameStore = defineStore('game', {
       const passiveUpgrade = state.upgrades.find((u) => u.id === 8)
       let multiplier = 0
       if (passiveUpgrade) {
-        multiplier =  passiveUpgrade.effect * (passiveUpgrade.level || 1)
+        multiplier = passiveUpgrade.effect * (passiveUpgrade.level || 1)
         // 添加收藏品加成
         multiplier += state.passiveSpeedMultiplier
       }
@@ -158,7 +158,7 @@ export const useGameStore = defineStore('game', {
   },
   actions: {
     // 升级收藏品
-    buyCollectible (collectibleId) {
+    buyCollectible(collectibleId) {
       // 查找收藏品
       const collectible = this.collectibles.find((c) => c.id === collectibleId)
       // 检查收藏品是否存在
@@ -167,6 +167,15 @@ export const useGameStore = defineStore('game', {
           type: 'error',
           title: '升级失败',
           message: '该收藏品不存在',
+          duration: 3000,
+        })
+        return false
+      }
+      if (collectible.maxLevel && collectible.level >= collectible.maxLevel) {
+        this.addNotification({
+          type: 'error',
+          title: '升级失败',
+          message: '该已经达到最高等级',
           duration: 3000,
         })
         return false
@@ -200,7 +209,7 @@ export const useGameStore = defineStore('game', {
       return true
     },
     // 初始化成就系统
-    initAchievements () {
+    initAchievements() {
       // 如果成就已经初始化过，则不再重复初始化
       if (this.achievements.length > 0) return
       // 为每种成就类型初始化第一批成就
@@ -220,7 +229,7 @@ export const useGameStore = defineStore('game', {
       }
     },
     // 生成成就描述
-    getAchievementDescription (type, requirement) {
+    getAchievementDescription(type, requirement) {
       switch (type) {
         case 'totalCoins':
           return `累计获得 ${this.formatNumber(requirement)} 枚金币`
@@ -233,7 +242,7 @@ export const useGameStore = defineStore('game', {
       }
     },
     // 生成下一级成就
-    generateNextTierAchievement (type, lastTier) {
+    generateNextTierAchievement(type, lastTier) {
       // 获取当前类型最高层级的成就
       const highestTier = achievementTiers[type][achievementTiers[type].length - 1]
       // 计算新的层级、需求和奖励
@@ -277,7 +286,7 @@ export const useGameStore = defineStore('game', {
       return newAchievement
     },
     // 点击获取金币
-    clickForCoins (type = 1) {
+    clickForCoins(type = 1) {
       // 计算上次点击事件和这次点击的时间相差
       const timeDifference = Date.now() - this.lastClickTime
       // 如果时间差小于0.1秒，则视为无效点击
@@ -291,6 +300,7 @@ export const useGameStore = defineStore('game', {
       // 获取基础点击收益和应用收藏品加成
       let baseCoins = 0
       if (type == 1) {
+        this.stats.totalClicks++
         baseCoins = this.coinsPerClick + this.collectibleClickPowerBonus
       } else if (type == 2) {
         // 获取基础被动收入和应用收藏品加成
@@ -335,7 +345,6 @@ export const useGameStore = defineStore('game', {
       }
       this.coins += baseCoins
       this.stats.totalCoinsEarned += baseCoins
-      this.stats.totalClicks++
       // 检查成就
       this.checkAchievements()
       this.lastClickTime = Date.now()
@@ -348,7 +357,7 @@ export const useGameStore = defineStore('game', {
       }
     },
     // 购买升级
-    buyUpgrade (upgradeId) {
+    buyUpgrade(upgradeId) {
       const upgrade = this.upgrades.find((u) => u.id === upgradeId)
       if (!upgrade) return false
       // 检查是否达到最大等级
@@ -369,7 +378,7 @@ export const useGameStore = defineStore('game', {
       return true
     },
     // 自动收集器的更新（每秒调用）
-    updatePassiveIncome (deltaTime = 1) {
+    updatePassiveIncome(deltaTime = 1) {
       // 获取基础被动收入和应用收藏品加成
       let baseIncome = this.coinsPerSecond + this.collectiblePassiveIncomeBonus
       // 应用被动加速效果
@@ -383,7 +392,7 @@ export const useGameStore = defineStore('game', {
       return income
     },
     // 检查成就解锁
-    checkAchievements () {
+    checkAchievements() {
       const newUnlocks = []
       this.achievements.forEach((achievement) => {
         if (achievement.unlocked) return
@@ -444,7 +453,7 @@ export const useGameStore = defineStore('game', {
       return newUnlocks
     },
     // 获取某个类型中等级最高的成就
-    getHighestTierAchievement (type) {
+    getHighestTierAchievement(type) {
       let highest = null
       let highestTier = 0
       this.achievements.forEach((achievement) => {
@@ -456,7 +465,7 @@ export const useGameStore = defineStore('game', {
       return highest
     },
     // 添加系统通知
-    addNotification (notification) {
+    addNotification(notification) {
       const id = Date.now()
       this.notifications.push({
         id,
@@ -472,14 +481,14 @@ export const useGameStore = defineStore('game', {
       return id
     },
     // 移除通知
-    removeNotification (id) {
+    removeNotification(id) {
       const index = this.notifications.findIndex((n) => n.id === id)
       if (index !== -1) {
         this.notifications.splice(index, 1)
       }
     },
     // 保存游戏
-    saveGame () {
+    saveGame() {
       // 收集需要保存的数据
       const gameData = {
         coins: this.coins,
@@ -522,7 +531,7 @@ export const useGameStore = defineStore('game', {
       }
     },
     // 加载游戏
-    loadGame () {
+    loadGame() {
       try {
         const savedData = localStorage.getItem(__APP_NAME__)
         if (!savedData) {
@@ -652,7 +661,7 @@ export const useGameStore = defineStore('game', {
       }
     },
     // 格式化数字
-    formatNumber (num) {
+    formatNumber(num) {
       if (num >= 1000000) {
         return (num / 1000000).toFixed(2) + 'M'
       } else if (num >= 1000) {
@@ -662,7 +671,7 @@ export const useGameStore = defineStore('game', {
       }
     },
     // 计算收藏品加成
-    calculateCollectibleBonuses () {
+    calculateCollectibleBonuses() {
       // 重置所有加成
       this.collectibleClickPowerBonus = 0
       this.collectiblePassiveIncomeBonus = 0

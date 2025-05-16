@@ -29,7 +29,9 @@
             </div>
             <Button :label="canBuyCollectible(item) ? '升级' : '金币不足'" :disabled="!canBuyCollectible(item)"
               @click="buyCollectible(item.id)" :severity="canBuyCollectible(item) ? 'success' : 'secondary'"
-              icon="pi pi-shopping-cart" />
+              icon="pi pi-shopping-cart">
+              {{ item.level >= item.maxLevel ? '已满级' : canBuyCollectible(item.id) ? '升级' : '金币不足' }}
+            </Button>
           </div>
         </template>
       </Card>
@@ -67,6 +69,8 @@ const filteredCollectibles = computed(() => {
 
 // 检查是否可以购买收藏品
 const canBuyCollectible = (item) => {
+  // 检查是否达到最大等级
+  if (item.maxLevel && item.level >= item.maxLevel) return false
   return gameStore.coins >= calculateUpgradeCost(item)
 }
 

@@ -12,7 +12,8 @@
           <p>
             {{ item.description }}
             <span class="upgrade-effect">
-              {{ item.id == 1 || item.id == 2 ? item.effect * (item.level || 1) : (item.effect * (item.level || 1) * 100).toFixed(1) }}
+              {{ item.id == 1 || item.id == 2 ? item.effect * (item.level || 1) : (item.effect * (item.level || 1) *
+                100).toFixed(1) }}
               {{ item.id == 1 || item.id == 2 ? '' : '%' }}
             </span>
           </p>
@@ -25,7 +26,7 @@
             </div>
             <Button @click="buyUpgrade(item.id)" :disabled="!gameStore.canBuyUpgrade(item.id)"
               :severity="gameStore.canBuyUpgrade(item.id) ? 'success' : 'secondary'" size="small">
-              {{ item.level === item.maxLevel ? '已满级' : gameStore.canBuyUpgrade(item.id) ? '购买' : '金币不足' }}
+              {{ item.level >= item.maxLevel ? '已满级' : gameStore.canBuyUpgrade(item.id) ? '升级' : '金币不足' }}
             </Button>
           </div>
         </template>
