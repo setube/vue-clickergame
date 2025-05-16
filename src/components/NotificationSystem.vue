@@ -31,7 +31,7 @@ const closeNotification = (id) => {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 1000;
+  z-index: 99999;
   max-width: 350px;
   max-height: 80vh;
   display: flex;

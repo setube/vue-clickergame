@@ -59,6 +59,10 @@
     <h3 class="section-title">游戏效率</h3>
     <div class="efficiency-stats">
       <div class="efficiency-stat">
+        <span>转生次数:</span>
+        <span>{{ gameStore.currentResurrection }}</span>
+      </div>
+      <div class="efficiency-stat">
         <span>平均每次点击:</span>
         <span>{{ gameStore.stats.totalClicks ? gameStore.formatNumber(gameStore.stats.totalCoinsEarned /
           gameStore.stats.totalClicks) : '0' }}

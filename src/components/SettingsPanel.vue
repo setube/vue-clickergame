@@ -21,6 +21,7 @@
     <div class="settings-section">
       <h3>游戏数据</h3>
       <div class="data-actions">
+        <Button icon="pi pi-sync" label="游戏转生" @click="currentResurrectionShow = true" severity="help" />
         <Button icon="pi pi-download" label="导出存档" @click="exportSave" severity="secondary" />
         <FileUpload mode="basic" accept="application/json" @select="importSave($event)" customUpload auto
           severity="secondary" chooseLabel="导入存档" />
@@ -52,12 +53,18 @@
         </Button>
       </div>
     </div>
-    <!-- 确认对话框 -->
-    <Dialog v-model:visible="resetConfirmVisible" header="确认重置" modal :draggable="false">
+    <Dialog v-model:visible="resetConfirmVisible" header="重置确认" modal :draggable="false">
       <p>确定要清除所有游戏数据吗？此操作无法撤销！</p>
       <template #footer>
         <Button label="取消" @click="resetConfirmVisible = false" severity="secondary" />
         <Button label="确认清除" @click="resetGame" severity="danger" />
+      </template>
+    </Dialog>
+    <Dialog v-model:visible="currentResurrectionShow" header="转生确认" modal :draggable="false">
+      <p>确定要转生吗? 转生后点击与自动收益减半, 升级与藏品数据清空</p>
+      <template #footer>
+        <Button label="取消" @click="currentResurrectionShow = false" severity="secondary" />
+        <Button label="确认转生" @click="currentResurrection" severity="danger" />
       </template>
     </Dialog>
   </div>
@@ -68,18 +75,51 @@ import { ref } from 'vue'
 import { useGameStore } from '../stores/gameStore'
 import { saveAs } from 'file-saver'
 import { useConfirm } from 'primevue/useconfirm'
+import { upgrades, collectibles } from '../stores/upgrades'
 
 const confirm = useConfirm()
 
 const appName = __APP_NAME__
 const gameStore = useGameStore()
 const resetConfirmVisible = ref(false)
+const currentResurrectionShow = ref(false)
 
 const requireConfirmation = (event) => {
   confirm.require({
     target: event.currentTarget,
     group: 'headless'
   })
+}
+
+// 转生
+const currentResurrection = () => {
+  // 转生点数
+  const currentResurrectionK = 1000 * (gameStore.currentResurrection + 1)
+  if (gameStore.coinsPerClick < currentResurrectionK || gameStore.coinsPerSecond < currentResurrectionK) {
+    gameStore.addNotification({
+      type: 'error',
+      title: '转生失败',
+      message: '转生所需点数不足',
+      duration: 3000
+    })
+    return
+  }
+  gameStore.coins = 0
+  gameStore.currentResurrection += 1
+  gameStore.coinsPerClick = Math.floor(gameStore.coinsPerClick / 2)
+  gameStore.coinsPerSecond = Math.floor(gameStore.coinsPerSecond / 2)
+  gameStore.upgrades = upgrades.map((item) => {
+    return {
+      ...item,
+      level: item.level || 0,
+      effect: item.effect,
+    }
+  })
+  gameStore.collectibles = collectibles
+  gameStore.achievementTiers = {}
+  gameStore.initAchievements()
+  gameStore.saveGame()
+  location.reload()
 }
 
 // 重置游戏

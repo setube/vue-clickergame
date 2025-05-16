@@ -4,6 +4,8 @@ import { achievementTiers, upgrades, collectibles } from './upgrades'
 
 export const useGameStore = defineStore('game', {
   state: () => ({
+    // 转生次数
+    currentResurrection: 0,
     // 游戏基本资源
     coins: 0,
     // 上次点击的时间
@@ -483,6 +485,7 @@ export const useGameStore = defineStore('game', {
         coins: this.coins,
         coinsPerClick: this.coinsPerClick,
         coinsPerSecond: this.coinsPerSecond,
+        currentResurrection: this.currentResurrection,
         // 只保存升级ID和等级
         upgrades: this.upgrades.map((upgrade) => ({
           id: upgrade.id,
@@ -542,6 +545,7 @@ export const useGameStore = defineStore('game', {
               this.coinsPerClick = gameData.coinsPerClick
               this.coinsPerSecond = gameData.coinsPerSecond
               this.settings = gameData.settings
+              this.currentResurrection = gameData.currentResurrection
               // 加载升级数据 - 将保存的ID和等级与完整模板合并
               if (gameData.upgrades && Array.isArray(gameData.upgrades)) {
                 // 创建升级模板的映射表以便快速查找
