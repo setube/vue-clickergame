@@ -12,7 +12,7 @@
           <p>
             {{ item.description }}
             <span class="upgrade-effect">
-              {{ item.id == 1 || item.id == 2 ? item.effect * (item.level || 1) : item.effect * (item.level || 1) * 100 }}
+              {{ item.id == 1 || item.id == 2 ? item.effect * (item.level || 1) : (item.effect * (item.level || 1) * 100).toFixed(1) }}
               {{ item.id == 1 || item.id == 2 ? '' : '%' }}
             </span>
           </p>

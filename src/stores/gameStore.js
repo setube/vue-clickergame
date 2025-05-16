@@ -48,9 +48,7 @@ export const useGameStore = defineStore('game', {
     getUpgradeCost: (state) => (upgradeId) => {
       const upgrade = state.upgrades.find((u) => u.id === upgradeId)
       if (!upgrade) return 0
-      return Math.floor(
-        upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level)
-      )
+      return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level))
     },
     // 检查是否能够购买升级
     canBuyUpgrade: (state) => (upgradeId) => {
@@ -97,11 +95,21 @@ export const useGameStore = defineStore('game', {
       // 确保几率不超过100%
       return Math.min(chance, 1.0)
     },
+    // 获取被动加速效率提升几率
+    passiveMultiplier: (state) => {
+      const passiveUpgrade = state.upgrades.find((u) => u.id === 8)
+      let multiplier = 0
+      if (passiveUpgrade) {
+        multiplier =  passiveUpgrade.effect * (passiveUpgrade.level || 1)
+        // 添加收藏品加成
+        multiplier += state.passiveSpeedMultiplier
+      }
+      return multiplier
+    },
     // 获取幸运加成倍率
     luckMultiplier: (state) => {
       const luckUpgrade = state.upgrades.find((u) => u.id === 9)
-      let multiplier =
-        1 + (luckUpgrade ? luckUpgrade.level * luckUpgrade.effect : 0)
+      let multiplier = 1 + (luckUpgrade ? luckUpgrade.level * luckUpgrade.effect : 0)
       // 添加收藏品加成
       multiplier += state.collectibleLuckBonus
       return multiplier
@@ -162,18 +170,17 @@ export const useGameStore = defineStore('game', {
         return false
       }
       // 检查金币是否足够
-      if (this.coins < collectible.cost) {
+      if (this.coins < collectible.cost * collectible.level) {
         this.addNotification({
           type: 'error',
           title: '金币不足',
-          message: `需要 ${this.formatNumber(collectible.cost)} 金币才能升级 ${collectible.name
-            }`,
+          message: `需要 ${this.formatNumber(collectible.cost)} 金币才能升级 ${collectible.name}`,
           duration: 3000,
         })
         return false
       }
       // 扣除金币
-      this.coins -= collectible.cost
+      this.coins -= collectible.cost * (collectible.level || 1)
       collectible.level++
       // 升级成本增长
       collectible.cost *= 1.5
@@ -268,7 +275,7 @@ export const useGameStore = defineStore('game', {
       return newAchievement
     },
     // 点击获取金币
-    clickForCoins () {
+    clickForCoins (type = 1) {
       // 计算上次点击事件和这次点击的时间相差
       const timeDifference = Date.now() - this.lastClickTime
       // 如果时间差小于0.1秒，则视为无效点击
@@ -280,7 +287,17 @@ export const useGameStore = defineStore('game', {
           hasExtraCoins: false,
         }
       // 获取基础点击收益和应用收藏品加成
-      let baseCoins = this.coinsPerClick + this.collectibleClickPowerBonus
+      let baseCoins
+      if (type == 1) {
+        baseCoins = this.coinsPerClick + this.collectibleClickPowerBonus
+      } else if (type == 2) {
+        // 获取基础被动收入和应用收藏品加成
+        baseCoins = this.coinsPerSecond + this.collectiblePassiveIncomeBonus
+        // 应用被动加速效果
+        const deltaTime = this.passiveMultiplier || 1
+        // 计算被动收入并应用收入增幅
+        baseCoins *= deltaTime * this.totalIncomeMultiplier
+      }
       let isCritical = false
       let isGoldenClick = false
       let hasExtraCoins = false
@@ -372,26 +389,39 @@ export const useGameStore = defineStore('game', {
         // 根据成就类型检查条件
         switch (achievement.type) {
           case 'totalCoins':
-            requirementMet =
-              this.stats.totalCoinsEarned >= achievement.requirement
+            requirementMet = this.stats.totalCoinsEarned >= achievement.requirement
             break
           case 'totalClicks':
             requirementMet = this.stats.totalClicks >= achievement.requirement
             break
           case 'totalUpgrades':
-            requirementMet =
-              this.stats.totalUpgradesPurchased >= achievement.requirement
+            requirementMet = this.stats.totalUpgradesPurchased >= achievement.requirement
             break
         }
         if (requirementMet) {
           achievement.unlocked = true
-          this.coins += achievement.reward
+          let text
+          switch (achievement.type) {
+            case 'totalCoins':
+              this.coinsPerSecond += achievement.reward
+              text = `你获得了${achievement.reward}金币的被动收入加成！`
+              break
+            case 'totalClicks':
+              this.coinsPerClick += achievement.reward
+              text = `你获得了${achievement.reward}金币的点击收益加成！`
+              break
+            case 'totalUpgrades':
+              this.coinsPerSecond += achievement.reward
+              this.coinsPerClick += achievement.reward
+              text = `你获得了${achievement.reward}金币的被动和点击收益加成！`
+              break
+          }
           newUnlocks.push(achievement)
           // 添加通知
           this.addNotification({
             type: 'achievement',
             title: '成就解锁！',
-            message: `成就"${achievement.name}"已解锁，获得${achievement.reward}金币奖励。`,
+            message: `成就"${achievement.name}"已解锁，${text}`,
             duration: 5000,
           })
           // 检查是否需要生成下一级成就

@@ -18,13 +18,14 @@
         <template #content>
           <p class="collectible-description">
             {{ item.description }}
-            +{{ item.id == 2 || item.id == 3 ? item.effect.value * (item.level || 1) : item.effect.value * (item.level || 1) * 100 }}
+            +{{ item.id == 2 || item.id == 3 ? item.effect.value * (item.level || 1) : (item.effect.value * (item.level
+              || 1) * 100).toFixed(1) }}
             {{ item.id == 2 || item.id == 3 ? '' : '%' }}
           </p>
           <div class="collectible-status">
             <div class="collectible-cost">
               <i class="pi pi-dollar"></i>
-              <span>{{ gameStore.formatNumber(item.cost) }}</span>
+              <span>{{ gameStore.formatNumber(item.cost * (item.level || 1)) }}</span>
             </div>
             <Button :label="canBuyCollectible(item) ? '升级' : '金币不足'" :disabled="!canBuyCollectible(item)"
               @click="buyCollectible(item.id)" :severity="canBuyCollectible(item) ? 'success' : 'secondary'"
@@ -66,7 +67,7 @@ const filteredCollectibles = computed(() => {
 
 // 检查是否可以购买收藏品
 const canBuyCollectible = (item) => {
-  return gameStore.coins >= item.cost
+  return gameStore.coins >= item.cost * (item.level || 1)
 }
 
 // 定义向父组件传递的事件
@@ -155,11 +156,9 @@ const buyCollectible = (collectibleId) => {
 
 .collectible-card.legendary {
   border-left: 4px solid #9c27b0;
-  background: linear-gradient(
-    135deg,
-    rgba(156, 39, 176, 0.05) 0%,
-    rgba(255, 255, 255, 1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(156, 39, 176, 0.05) 0%,
+      rgba(255, 255, 255, 1) 100%);
 }
 
 .collectible-header {

@@ -21,8 +21,8 @@ export const upgrades = [
   },
   {
     id: 3,
-    name: '点击暴击',
-    description: '双倍点击收益几率',
+    name: '收益暴击',
+    description: '双倍收益几率',
     baseCost: 2000,
     level: 0,
     effect: 0.01, // 暴击几率增加值
@@ -97,8 +97,8 @@ export const upgrades = [
   },
   {
     id: 10,
-    name: '黄金点击',
-    description: '触发超级点击，获得10倍金币的几率为',
+    name: '黄金奖励',
+    description: '触发超级大奖，获得10倍金币的几率为',
     baseCost: 10000,
     level: 0,
     effect: 0.001, // 每级增加0.1%触发几率

@@ -61,7 +61,7 @@ onMounted(() => {
   gameStore.passiveIncomeInterval = setInterval(() => {
     try {
       if (coinsPerSecondData.value > 0) {
-        gameStore.updatePassiveIncome(1)
+        gameStore.clickForCoins(2)
         updateUIData() // 更新UI数据
       }
     } catch (error) {

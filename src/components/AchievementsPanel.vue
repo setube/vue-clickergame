@@ -26,7 +26,7 @@
             <ProgressBar :value="getProgressValue(achievement)" />
           </div>
           <div class="achievement-reward" v-if="achievement.unlocked">
-            <span>奖励: {{ achievement.reward }} 金币</span>
+            <span>奖励: {{ getRewardText(achievement) }}</span>
           </div>
         </template>
       </Card>
@@ -66,6 +66,24 @@ const getProgressText = (achievement) => {
       break
   }
   return `${Math.floor(Math.min(currentValue, achievement.requirement))}/${achievement.requirement}`
+}
+
+// 获取成就奖励文本
+const getRewardText = (achievement) => {
+  let text
+  // 根据成就类型获取当前值
+  switch (achievement.type) {
+    case 'totalCoins':
+      text = `${achievement.reward}金币自动收入加成！`
+      break
+    case 'totalClicks':
+      text = `${achievement.reward}金币点击收益加成！`
+      break
+    case 'totalUpgrades':
+      text = `${achievement.reward}金币自动和点击收益加成！`
+      break
+  }
+  return text
 }
 
 // 获取成就进度值（百分比）
@@ -181,4 +199,4 @@ const getProgressValue = (achievement) => {
     width: 100%;
   }
 }
-</style> 
+</style>

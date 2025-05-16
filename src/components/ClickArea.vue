@@ -22,7 +22,7 @@ const clickArea = ref(null)
 // 处理点击事件
 const handleClick = (event) => {
   // 更新游戏状态并获取点击结果
-  const clickResult = gameStore.clickForCoins()
+  const clickResult = gameStore.clickForCoins(1)
   if (!clickResult.amount) return
   // 创建点击动画效果
   createClickEffect(event, clickResult.isCritical)
