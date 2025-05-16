@@ -289,7 +289,7 @@ export const useGameStore = defineStore('game', {
           hasExtraCoins: false,
         }
       // 获取基础点击收益和应用收藏品加成
-      let baseCoins
+      let baseCoins = 0
       if (type == 1) {
         baseCoins = this.coinsPerClick + this.collectibleClickPowerBonus
       } else if (type == 2) {
@@ -298,7 +298,7 @@ export const useGameStore = defineStore('game', {
         // 应用被动加速效果
         const deltaTime = this.passiveMultiplier || 1
         // 计算被动收入并应用收入增幅
-        baseCoins *= deltaTime * this.totalIncomeMultiplier
+        baseCoins += (baseCoins * deltaTime * this.totalIncomeMultiplier)
       }
       let isCritical = false
       let isGoldenClick = false
