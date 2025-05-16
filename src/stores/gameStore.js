@@ -129,7 +129,7 @@ export const useGameStore = defineStore('game', {
     collectibleIncomeMultiplier: (state) => {
       return state.collectibles
         .filter((item) => item.level && item.effect.type === 'incomeMultiplier')
-        .reduce((sum, item) => item.level * item.effect.value, 1.0)
+        .reduce((sum, item) => (item.level) * item.effect.value, 1.0)
     },
     // 从收藏品中获得的暴击倍率加成
     collectibleCritPowerBonus: (state) => {
@@ -298,14 +298,14 @@ export const useGameStore = defineStore('game', {
         // 应用被动加速效果
         const deltaTime = this.passiveMultiplier || 1
         // 计算被动收入并应用收入增幅
-        baseCoins += (baseCoins * deltaTime * this.totalIncomeMultiplier)
+        baseCoins += (baseCoins * deltaTime)
       }
       let isCritical = false
       let isGoldenClick = false
       let hasExtraCoins = false
       // 检查是否触发暴击
       if (Math.random() < this.criticalHitChance) {
-        baseCoins *= this.criticalHitMultiplier // 使用暴击倍率而不是固定值
+        baseCoins += baseCoins * this.criticalHitMultiplier // 使用暴击倍率而不是固定值
         this.stats.criticalHits++
         isCritical = true
       }
@@ -328,10 +328,10 @@ export const useGameStore = defineStore('game', {
         hasExtraCoins = true
       }
       // 应用收入增幅
-      baseCoins *= this.totalIncomeMultiplier
+      baseCoins += baseCoins * this.totalIncomeMultiplier
       // 应用幸运加成（只对随机奖励生效）
       if (isCritical || isGoldenClick || hasExtraCoins) {
-        baseCoins *= this.luckMultiplier
+        baseCoins += baseCoins * this.luckMultiplier
       }
       this.coins += baseCoins
       this.stats.totalCoinsEarned += baseCoins
