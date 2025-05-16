@@ -60,7 +60,7 @@
         <Button label="确认清除" @click="resetGame" severity="danger" />
       </template>
     </Dialog>
-    <Dialog v-model:visible="currentResurrectionShow" header="转生确认" modal :draggable="false">
+    <Dialog v-model:visible="currentResurrectionShow" :header="`第${currentResurrectionK / 1000}次转生确认`" modal :draggable="false">
       <p>确定要转生吗? 转生后点击与自动收益减半, 升级与藏品数据清空</p>
       <template #footer>
         <Button label="取消" @click="currentResurrectionShow = false" severity="secondary" />
@@ -75,12 +75,13 @@ import { ref } from 'vue'
 import { useGameStore } from '../stores/gameStore'
 import { saveAs } from 'file-saver'
 import { useConfirm } from 'primevue/useconfirm'
-import { upgrades, collectibles } from '../stores/upgrades'
+import { achievementTiers, upgrades, collectibles } from '../stores/upgrades'
 
 const confirm = useConfirm()
 
 const appName = __APP_NAME__
 const gameStore = useGameStore()
+const currentResurrectionK = 1000 * (gameStore.currentResurrection + 1)
 const resetConfirmVisible = ref(false)
 const currentResurrectionShow = ref(false)
 
@@ -94,12 +95,20 @@ const requireConfirmation = (event) => {
 // 转生
 const currentResurrection = () => {
   // 转生点数
-  const currentResurrectionK = 1000 * (gameStore.currentResurrection + 1)
-  if (gameStore.coinsPerClick < currentResurrectionK || gameStore.coinsPerSecond < currentResurrectionK) {
+  if (gameStore.coinsPerClick < currentResurrectionK) {
     gameStore.addNotification({
       type: 'error',
       title: '转生失败',
-      message: '转生所需点数不足',
+      message: `转生所需点数不足${gameStore.coinsPerClick} / ${currentResurrectionK}`,
+      duration: 3000
+    })
+    return
+  }
+  if (gameStore.coinsPerSecond < currentResurrectionK) {
+    gameStore.addNotification({
+      type: 'error',
+      title: '转生失败',
+      message: `转生所需点数不足${gameStore.coinsPerSecond} / ${currentResurrectionK}`,
       duration: 3000
     })
     return
@@ -117,7 +126,20 @@ const currentResurrection = () => {
   })
   gameStore.collectibles = collectibles
   gameStore.achievementTiers = {}
-  gameStore.initAchievements()
+  for (const type in achievementTiers) {
+    achievementTiers[type].forEach((tier, index) => {
+      gameStore.achievements.push({
+        id: `${type}_${tier.tier}`,
+        name: tier.name,
+        description: gameStore.getAchievementDescription(type, tier.requirement),
+        requirement: tier.requirement,
+        type: type,
+        tier: tier.tier,
+        unlocked: false,
+        reward: tier.reward,
+      })
+    })
+  }
   gameStore.saveGame()
   location.reload()
 }

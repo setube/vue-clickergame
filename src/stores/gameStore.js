@@ -580,7 +580,7 @@ export const useGameStore = defineStore('game', {
                   // 合并模板和保存的状态
                   return {
                     ...template,
-                    cost: savedCollectible.cost,
+                    cost: savedCollectible.cost || template.cost,
                     level: savedCollectible.level || 0,
                   }
                 })
