@@ -1,0 +1,30 @@
+name: 自动化创建Docker镜像
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 检查代码
+        uses: actions/checkout@v2
+
+      - name: 登录 GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: 构建Docker镜像
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/vue-clickergame:latest .
+
+      - name: 推送到 GitHub Container Registry
+        run: docker push ghcr.io/${{ github.repository_owner }}/vue-clickergame:latest
