@@ -30,7 +30,7 @@
             <Button :label="canBuyCollectible(item) ? '升级' : '金币不足'" :disabled="!canBuyCollectible(item)"
               @click="buyCollectible(item.id)" :severity="canBuyCollectible(item) ? 'success' : 'secondary'"
               icon="pi pi-shopping-cart">
-              {{ item.level >= item.maxLevel ? '已满级' : canBuyCollectible(item.id) ? '升级' : '金币不足' }}
+              {{ item.level >= item.maxLevel ? '已满级' : canBuyCollectible(item) ? '升级' : '金币不足' }}
             </Button>
           </div>
         </template>
