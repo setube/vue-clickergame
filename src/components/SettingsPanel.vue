@@ -60,7 +60,8 @@
         <Button label="确认清除" @click="resetGame" severity="danger" />
       </template>
     </Dialog>
-    <Dialog v-model:visible="currentResurrectionShow" :header="`第${currentResurrectionK / 1000}次转生确认`" modal :draggable="false">
+    <Dialog v-model:visible="currentResurrectionShow" :header="`第${currentResurrectionK / 1000}次转生确认`" modal
+      :draggable="false">
       <p>确定要转生吗? 转生后点击与自动收益减半, 升级与藏品数据清空</p>
       <template #footer>
         <Button label="取消" @click="currentResurrectionShow = false" severity="secondary" />
@@ -71,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useGameStore } from '../stores/gameStore'
 import { saveAs } from 'file-saver'
 import { useConfirm } from 'primevue/useconfirm'
@@ -81,7 +82,7 @@ const confirm = useConfirm()
 
 const appName = __APP_NAME__
 const gameStore = useGameStore()
-const currentResurrectionK = 1000 * (gameStore.currentResurrection + 1)
+const currentResurrectionK = computed(() => 1000 * (gameStore.currentResurrection + 1))
 const resetConfirmVisible = ref(false)
 const currentResurrectionShow = ref(false)
 
@@ -94,21 +95,20 @@ const requireConfirmation = (event) => {
 
 // 转生
 const currentResurrection = () => {
-  // 转生点数
-  if (gameStore.coinsPerClick < currentResurrectionK) {
+  if (gameStore.coinsPerClick < currentResurrectionK.value) {
     gameStore.addNotification({
       type: 'error',
       title: '转生失败',
-      message: `转生所需点数不足${gameStore.coinsPerClick} / ${currentResurrectionK}`,
+      message: `转生所需点数不足${gameStore.coinsPerClick} / ${currentResurrectionK.value}`,
       duration: 3000
     })
     return
   }
-  if (gameStore.coinsPerSecond < currentResurrectionK) {
+  if (gameStore.coinsPerSecond < currentResurrectionK.value) {
     gameStore.addNotification({
       type: 'error',
       title: '转生失败',
-      message: `转生所需点数不足${gameStore.coinsPerSecond} / ${currentResurrectionK}`,
+      message: `转生所需点数不足${gameStore.coinsPerSecond} / ${currentResurrectionK.value}`,
       duration: 3000
     })
     return

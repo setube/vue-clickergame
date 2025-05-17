@@ -195,6 +195,7 @@ export const useGameStore = defineStore('game', {
       collectible.level++
       // 升级成本增长
       collectible.cost *= 1.5
+      this.stats.totalUpgradesPurchased++
       // 重新计算所有收藏品加成
       this.calculateCollectibleBonuses()
       // 保存游戏
@@ -286,7 +287,7 @@ export const useGameStore = defineStore('game', {
       return newAchievement
     },
     // 点击获取金币
-    clickForCoins(type = 1) {
+    clickForCoins(type = 1, time = 0) {
       // 计算上次点击事件和这次点击的时间相差
       const timeDifference = Date.now() - this.lastClickTime
       // 如果时间差小于0.1秒，则视为无效点击
@@ -343,7 +344,8 @@ export const useGameStore = defineStore('game', {
       if (isCritical || isGoldenClick || hasExtraCoins) {
         baseCoins += baseCoins * this.luckMultiplier
       }
-      this.coins += baseCoins
+      const coins = time ? time * baseCoins : baseCoins
+      this.coins += coins
       this.stats.totalCoinsEarned += baseCoins
       // 检查成就
       this.checkAchievements()
@@ -354,6 +356,7 @@ export const useGameStore = defineStore('game', {
         isCritical,
         isGoldenClick,
         hasExtraCoins,
+        coins
       }
     },
     // 购买升级
@@ -376,20 +379,6 @@ export const useGameStore = defineStore('game', {
       // 检查成就
       this.checkAchievements()
       return true
-    },
-    // 自动收集器的更新（每秒调用）
-    updatePassiveIncome(deltaTime = 1) {
-      // 获取基础被动收入和应用收藏品加成
-      let baseIncome = this.coinsPerSecond + this.collectiblePassiveIncomeBonus
-      // 应用被动加速效果
-      const effectiveDeltaTime = deltaTime * this.passiveSpeedMultiplier || 1
-      // 计算被动收入并应用收入增幅
-      let income = baseIncome * effectiveDeltaTime * this.totalIncomeMultiplier
-      this.coins += income
-      this.stats.totalCoinsEarned += income
-      // 检查成就
-      this.checkAchievements()
-      return income
     },
     // 检查成就解锁
     checkAchievements() {
@@ -626,13 +615,15 @@ export const useGameStore = defineStore('game', {
               const now = Date.now()
               const lastSaved = gameData.lastSaved || now
               const offlineTime = (now - lastSaved) / 1000 // 转换为秒
-              if (offlineTime > 600 && this.coinsPerSecond > 0) {
-                // 至少10秒以上的离线时间才计算
+              if (offlineTime > 60 && this.coinsPerSecond > 0) {
+                // 至少60秒以上的离线时间才计算
                 const maxOfflineTime = 24 * 60 * 60 // 最多计算24小时的离线收入
                 const effectiveOfflineTime = Math.min(offlineTime, maxOfflineTime)
-                const offlineIncome = this.updatePassiveIncome(effectiveOfflineTime)
+                const offlineIncome = this.clickForCoins(2, effectiveOfflineTime).coins * 0.5
                 // 显示离线收入通知
-                const timeText = effectiveOfflineTime > 3600 ? `${Math.floor(effectiveOfflineTime / 3600)}小时${Math.floor((effectiveOfflineTime % 3600) / 60)}分钟` : `${Math.floor(effectiveOfflineTime / 60)}分钟`
+                const timeText = effectiveOfflineTime > 3600
+                  ? `${Math.floor(effectiveOfflineTime / 3600)}小时${Math.floor((effectiveOfflineTime % 3600) / 60)}分钟`
+                  : `${Math.floor(effectiveOfflineTime / 60)}分钟`
                 this.addNotification({
                   type: 'info',
                   title: '离线收入',
